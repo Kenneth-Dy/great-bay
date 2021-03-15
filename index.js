@@ -10,7 +10,7 @@ const mainMenu = () => {
       type: 'list',
       name: 'action',
       message: 'Select action:',
-      choices: ['Post an item','Bid on an item', 'Exit']
+      choices: ['Post an item','Bid on an item', 'List items', 'Exit']
     }
   ])
     .then(({ action }) => {
@@ -18,8 +18,10 @@ const mainMenu = () => {
     postItem()
   }else if (action === 'Bid on an item') {
     bidItem()
-  }else if (action === 'Exit'){
+  }else if (action === 'Exit') {
     process.exit()
+  } else if (action === 'List items') {
+    listItems()
   }
     })
     .catch(err => console.log(err))
@@ -71,9 +73,6 @@ const bidItem = () => {
     ])
       .then( ({name, price}) => {
         let item = items.filter(data => data.name === name)
-        // console.log(item)
-        // item.price
-        // console.log(items)
         if(price > item[0].price) {
           db.query('UPDATE items SET ? WHERE ?',[{price}, {name}], err =>{
             if(err) {console.log(err)}
@@ -87,7 +86,14 @@ const bidItem = () => {
       })
       .catch(err => console.log(err))
   })
+}
 
+const listItems = () => {
+  db.query('SELECT * FROM items', (err, items) => {
+    if(err) { console.log(err)}
+    console.table(items)
+    mainMenu()
+  })
 }
 
 mainMenu()
